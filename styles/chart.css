@@ -1,0 +1,150 @@
+﻿html * {
+    box-sizing: border-box;
+}
+
+.buttonActive {
+    background-color: red;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.row {
+    display: flex;
+}
+
+/* Create three equal columns that sits next to each other */
+.column {
+    flex: 33.33%;
+    padding: 5px;
+}
+
+.no-close .ui-dialog-titlebar-close {
+    display: none;
+}
+
+.zeroline {
+    fill: none;
+    stroke: red;
+    stroke-width: 0.5px;
+    stroke-dasharray: 5 5;
+}
+
+.indicatorline1 {
+    fill: none;
+    stroke: green;
+    stroke-width: 0.5px;
+}
+
+.indicatorline2 {
+    fill: none;
+    stroke: blue;
+    stroke-width: 1.5px;
+}
+
+.indicatorline3 {
+    fill: none;
+    stroke: magenta;
+    stroke-width: 1.5px;
+}
+
+.overlay {
+    fill: none;
+    stroke: none;
+    pointer-events: all;
+}
+
+.focusLine {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 0.5px;
+}
+
+#chart {
+    width: 1200px;
+    position: relative;
+}
+
+#dataheader {
+    font: 14px sans-serif;
+
+}
+
+.chart .axis text {
+    font: 10px sans-serif;
+}
+
+.chart .axis .domain,
+.chart .axis .tick line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+path {
+    stroke: steelblue;
+    stroke-width: 1;
+    fill: none;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+.chart .gridlines {
+    stroke: lightgrey;
+    shape-rendering: crispEdges;
+    stroke-width: 1;
+}
+
+.chart .ohlc-series path {
+    stroke-width: 1.5px;
+}
+
+.chart .ohlc-series .up-days {
+    stroke: green;
+}
+
+.chart .ohlc-series .down-days {
+    stroke: red;
+}
+
+.chart .ohlc-series .bar.up-day {
+    stroke: green;
+}
+
+.chart .ohlc-series .bar.down-day {
+    stroke: red;
+}
+
+.chart .candlestick-series .bar path {
+    stroke: #007fff;
+}
+
+.chart .comparison-series .line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1px;
+}
+
+.chart .bar.up-day rect {
+    fill: rgb(255,255,255);
+    stroke-width: 1;
+    stroke: #007fff;
+}
+
+.chart .bar.down-day rect {
+    fill: #007fff;
+}
+
+.chart .zoom-pane {
+    fill: none;
+    pointer-events: all;
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+}
