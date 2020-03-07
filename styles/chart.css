@@ -2,8 +2,22 @@
     box-sizing: border-box;
 }
 
-.buttonActive {
-    background-color: red;
+.buttonActive1 {
+    background-color: blue;
+    color: white;
+    border: none;
+}
+
+.buttonActive2 {
+    background-color:green ;
+    color: white;
+    border: none;
+}
+
+
+.buttonInActive {
+    background-color: "";
+    color: "";
 }
 
 * {
@@ -147,4 +161,31 @@ path {
     pointer-events: all;
     cursor: -webkit-grab;
     cursor: -moz-grab;
+}
+
+#chart {
+    margin-left: 40px;
+    width: 800px;
+    height: 600px;
+    position: relative;
+}
+#dialog {
+    position: absolute;
+    background-color: rgb(233, 227, 227);
+    opacity: 0.5;
+}
+
+#chart {
+     position: relative;
+}
+
+.hideDiv{
+    visibility: hidden;
+    display: none;
+
+}
+
+.showDiv{
+    visibility: visible;
+    display: block;
 }

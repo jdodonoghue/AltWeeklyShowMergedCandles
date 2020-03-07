@@ -1,5 +1,5 @@
 
-    sl.series.candlestick = function () {
+    var candlestickSeries = function () {
         
         var xScale = d3.scaleTime(),
             yScale = d3.scaleLinear();
@@ -59,7 +59,7 @@
                 });
         };
 
-        var candlestick = function(selection) {
+        var candlestickSeries = function(selection) {
             var series, bars;
             
             selection.each(function(data) {
@@ -85,30 +85,30 @@
             });
         };
 
-        candlestick.xScale = function (value) {
+        candlestickSeries.xScale = function (value) {
             if (!arguments.length) {
                 return xScale;
             }
             xScale = value;
-            return candlestick;
+            return candlestickSeries;
         };
 
-        candlestick.yScale = function (value) {
+        candlestickSeries.yScale = function (value) {
             if (!arguments.length) {
                 return yScale;
             }
             yScale = value;
-            return candlestick;
+            return candlestickSeries;
         };
 
-        candlestick.rectangleWidth = function (value) {
+        candlestickSeries.rectangleWidth = function (value) {
             if (!arguments.length) {
                 return rectangleWidth;
             }
             rectangleWidth = value;
-            return candlestick;
+            return candlestickSeries;
         };
 
-        return candlestick;
+        return candlestickSeries;
 
     };

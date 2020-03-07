@@ -4,179 +4,280 @@
 
 <title>Alternative Weekly Chart</title>
 <link rel="stylesheet" type="text/css" href="../styles/chart.css" />
-<link rel="stylesheet" href="../styles/jquery-ui.css" />
+
 <script src="https://d3js.org/d3.v5.min.js"></script>
-<script
-  src="https://code.jquery.com/jquery-3.4.1.min.js"
-  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-  crossorigin="anonymous"></script>
- <script
-  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
-  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
-  crossorigin="anonymous"></script>
-<script type="text/javascript" src="../scripts/sl.js"></script>
-<script type="text/javascript" src="../scripts/tickWidth.js"></script>
-<script type="text/javascript" src="../scripts/moment.js"></script>
-<script type="text/javascript" src="../scripts/moment-range.js"></script>
-<script type="text/javascript" src="../scripts/candlestickSeries.js"></script>
-<script type="text/javascript" src="../scripts/ohlcSeries.js"></script>
-<script type="text/javascript" src="../scripts/zoomChart.js"></script>
-<script type="text/javascript" src="../scripts/app.js"></script>
+<script type="text/javascript" src="scripts/candlestickSeries.js"></script>
+<script type="text/javascript" src="scripts/ohlcSeries.js"></script>
+<script type="text/javascript" src="scripts/tickWidth.js" ></script>
+<script type="text/javascript" src="scripts/moment.js"></script>
+<script type="text/javascript" src="scripts/app.js"></script>
+<script type="text/javascript" src="scripts/moment-range.js" ></script>
+<script type="text/javascript" src="scripts/chartObj.js"></script>
 
 <script>
-    //"use strict";
-
+    "use strict";
     var chartType = "CandleStick";
-    //var chartType = "OHLC";
-    var currentSymbol = "";
-    //var startday = 2;
-    //var fromDate = "01/01/2018";
-    //var toDate = "10/31/2019";
+    var fromDate = "";
+    var toDate = "";
+    var showIndicator = false;
+    var chart1 = null;
+    var chart2 = null;
+    var showMerged = false;
+    var chart1id = 0;
+    var weeklydata = [];
+    var dailydata = []
+    
+    function loadData(){
+        var fromDate = new Date("2018-01-01");
+        var toDate = new Date("2019-12-31");
 
-    function render(data, chartType) {
-
-        data.forEach(function (d) {
-            d.date = new Date(d.date);
-            d.open = +d.open;
-            d.high = +d.high;
-            d.low = +d.low;
-            d.close = +d.close;
+        var file1 = "data/" + "AltWeekly" + ".csv";
+        d3.csv(file1).then(function (data) {
+            data.forEach(function (d) {
+                d.date = new Date(d.date);
+                d.open = +d.open;
+                d.high = +d.high;
+                d.low = +d.low;
+                d.close = +d.close;
+                d.startday = +d.startday;
+                d.id = +d.id;
+            });
+            weeklydata = data.filter(function(d) {
+                return (d.date >= fromDate && d.date <= toDate);
+            });
         });
-        
-        var fromDate = d3.min(data, function (d) { return d["date"]; });
-        var toDate = d3.max(data, function (d) { return d["date"]; });
 
-        var zoomChart = sl.example.zoomChart(data, fromDate, toDate);
-
-        zoomChart();
-
+        var file2 = "data/" + "AltDaily" + ".csv";
+        d3.csv(file2).then(function (data) {
+            data.forEach(function (d) {
+                d.date = new Date(d.date);
+                d.open = +d.open;
+                d.high = +d.high;
+                d.low = +d.low;
+                d.close = +d.close;
+                d.startday = +d.startday;
+                d.id = +d.id;
+            });
+            dailydata = data.filter(function(d) {
+                return (d.date >= fromDate && d.date <= toDate);
+            });
+        });
     }
 
+    
+    
     
     
 </script>
 </header>
 <body>
-<div>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <select id="selCommidity" onchange="chooseCommodity(this);">
+<div style="margin-left: 140px; margin-bottom: 10px">
+    
+    <select id="selCommidity" onchange="chooseCommodity(this);" style="margin-right: 10px">
         <option value="0">Select Commodity</option>
         <option value="@KC">Coffee</option>
         <option value="@CC">Cocoa</option>
         <option value="@SB">Sugar</option>
-        
-    </select>&nbsp;&nbsp;&nbsp;
+    </select>
 
-    <select id="selWeekStart" onchange="chooseWeekStart(this);" style="visibility:hidden;display:none">
-        <option value="2" selected>Monday thru Friday</option>
-        <option value="3">Tuesday thru Monday</option>
-        <option value="4">Wednesday thru Tuesday</option>
-        <option value="5">Thursday thru Wednesday</option>
-        <option value="6">Friday thru Thursday</option>
-    </select>&nbsp;&nbsp;&nbsp;
-
-    <select id="selYears" style="visibility:hidden;display:none">
+    <select id="selYears" style="visibility:hidden;display:none" style="margin-right: 10px">
         <option value="2">Last 2 years</option>
         <option value="5">Last 5 years</option>
         <option value="10">Last 10 years</option>
     </select>
-    <button id="btnCandleStick" disabled onclick="changeChartType(this);">CandleStick</button>&nbsp;&nbsp;&nbsp;
-    <button id="btnOHLC" disabled onclick="changeChartType(this);">OHLC</button>&nbsp;&nbsp;&nbsp;
 
-    <button id="btnPTOn" disabled onclick="focusOn(VerHor);setBtnStyle(this);">Pointer Tracking On</button>&nbsp;&nbsp;&nbsp;
-    <button id="btnVerOn" onclick="focusOn(Ver);">Vertical On</button>&nbsp;&nbsp;&nbsp;
-    <button id="btnHorOn" onclick="focusOn(Hor);">Horizontal On</button>&nbsp;&nbsp;&nbsp;
-    <button id="btnOff" onclick="setBtnStyle(this);focusOff();">Focus Off</button>&nbsp;&nbsp;&nbsp;
+    <button id="btnCandleStick" disabled onclick="changeChartType(this);" style="margin-right: 10px">CandleStick</button>
+    <button id="btnOHLC" disabled onclick="changeChartType(this);" style="margin-right: 10px">OHLC</button>
 
-    <button id="btnShowMerged" onclick="setBtnStyle(this);showMerged();">Merged Bars</button>&nbsp;&nbsp;&nbsp;
-
-
+    <button id="btnPTOn" disabled onclick="chart1.focusOn(chart1.VerHor);setBtnStyle(this);" style="margin-right: 10px">Pointer Tracking On</button>
+    <button id="btnVerOn" onclick="chart1.focusOn(chart1.Ver);setBtnStyle(this);" style="margin-right: 10px">Vertical On</button>
+    <button id="btnHorOn" onclick="chart1.focusOn(chart1.Hor);setBtnStyle(this);" style="margin-right: 10px">Horizontal On</button>
+    <button id="btnOff" onclick="chart1.focusOff();setBtnStyle(this);" style="margin-right: 10px">Focus Off</button>
 </div>
-<div id="dataheader" style="margin-left: 100px; margin-top: 30px;" ></div>
+<div style="margin-left: 140px; margin-bottom: 10px;">
+    
+    <select id="selWeekStart" onchange="chooseWeekStart(this);" style="margin-right: 10px">
+            <option value="2" selected>Monday thru Friday</option>
+            <option value="3">Tuesday thru Monday</option>
+            <option value="4">Wednesday thru Tuesday</option>
+            <option value="5">Thursday thru Wednesday</option>
+            <option value="6">Friday thru Thursday</option>
+        </select>
+
+    <select id="selShowMerged" onchange="showMergedDialog(this);" style="margin-right: 10px">
+        <option value="0">Show Merged Bars</option>
+        <option value="1">current bar</option>
+        <option value="2">last 2 bars</option>
+        <option value="3">last 3 bars</option>
+        <option value="4">last 4 bars</option>
+        <option value="5">last 5 bars</option>
+    </select>
+    
+    <select id="selShowInsideBars" onchange="showInsideBars(this);" style="margin-right: 10px">
+        <option value="0">Show Inside Bars</option>
+        <option value="1">current bar</option>
+        <option value="2">last 2 bars</option>
+        <option value="3">last 3 bars</option>
+        <option value="4">last 4 bars</option>
+        <option value="5">last 5 bars</option>
+    </select>
+</div>
+<div id="dataheader" style="margin-left: 140px; margin-bottom: 10px" ></div>
 <div id="chart"></div>
-<div id="dialog" title="Basic dialog">
+<div id="dialog" class="hideDiv"></div>
 
-</div>
-<script>
-    //"use strict";
-    $(document).ready(function () {
-        var selCommodity = document.getElementById("selCommidity");
-        selCommodity.selectedIndex = 1;
-        chooseCommodity(selCommodity);
-        
-        //loadDialog();
-    });
-    
-    /*
-    $( document ).mousemove(function( event ) {
-        $( "#dialog" ).position({
-            //autoOpen: false,
-            my: "left+3 bottom-3",
-            of: event,
-            collision: "fit"
-        });
-    });
-    */
-/*
-    $("#d").dialog("option", { position: [e.pageX+5, (e.pageY+5)-$(document).scrollTop()] });    
-    
-    $(document).mousemove(function (e) {
-        $("#d").dialog("option", { position: [e.pageX+5, e.pageY+5] });
-    });
-
-    $("#d").dialog({
-        autoOpen: false,
-        show: "blind",
-        hide: "explode"
-    });
-    $("#c").bind("mouseover", function () {
-        $("#d").dialog('open'); // open
-    });
-    $("#c").bind("mouseleave", function () {
-        $("#d").dialog('close'); // open
-    });
- */
-    $("#btnCandleStick").css("background-color", "rgb(69, 140, 161)");
-    $("#btnCandleStick").css("color", "white");
-    $("#btnOHLC").css("background-color", "");
-    $("#btnOHLC").css("color", "");
-
-</script>
 <script>
     
-    function loadDialog(){
-        var dataShowMe = [];
+    
+    var showInsideBars = function(obj){
+        hideDialog();
         
-        var startDate = new Date("2018-09-01");
-        var endDate = new Date("2018-10-10");
+        if (obj.value > 0){
+            showDialogInside();
+        }
+    }
 
-        //var dataShowMe = [{ "date": "2014-07-01T04:00:00.000Z", "open": 100, "high": 100.77933677395484, "low": 99.89040262146548, "close": 100.52004807497097 }, { "date": "2014-07-02T04:00:00.000Z", "open": 100.4173923750163, "high": 100.95641921200553, "low": 100.08646893402194, "close": 100.26321198939311 }, { "date": "2014-07-03T04:00:00.000Z", "open": 100.13213079410242, "high": 100.6563225382918, "low": 100.13213079410242, "close": 100.24186496783483 }, { "date": "2014-07-04T04:00:00.000Z", "open": 100.29756557882858, "high": 101.62574724353887, "low": 100.29756557882858, "close": 101.4345797240218 }, { "date": "2014-07-07T04:00:00.000Z", "open": 101.55051823119851, "high": 101.79416052667243, "low": 100.46977894613943, "close": 100.5701651501333 }, { "date": "2014-07-08T04:00:00.000Z", "open": 100.51949616581578, "high": 101.2541476303382, "low": 100.49172474672137, "close": 100.77318865683101 }, { "date": "2014-07-09T04:00:00.000Z", "open": 100.73981203450614, "high": 101.27928092179276, "low": 100.21006034165501, "close": 101.00883764668177 }, { "date": "2014-07-10T04:00:00.000Z", "open": 101.02357139231204, "high": 101.21425571636165, "low": 100.66064928629352, "close": 101.0551599213134 }, { "date": "2014-07-11T04:00:00.000Z", "open": 100.98148072382585, "high": 101.22017536744559, "low": 100.07227760309686, "close": 100.30345350510433 }, { "date": "2014-07-14T04:00:00.000Z", "open": 100.37799266692713, "high": 101.50659706766662, "low": 100.23694420320739, "close": 101.1830336245854 }, { "date": "2014-07-15T04:00:00.000Z", "open": 101.14063511111313, "high": 102.3541406984362, "low": 101.02609247187875, "close": 102.15736246393503 }, { "date": "2014-07-16T04:00:00.000Z", "open": 102.09910713869921, "high": 103.04458155081856, "low": 101.98062630744637, "close": 103.04458155081856 }, { "date": "2014-07-17T04:00:00.000Z", "open": 103.00912681135291, "high": 103.1052240943384, "low": 102.18918369229661, "close": 102.47992474725584 }, { "date": "2014-07-18T04:00:00.000Z", "open": 102.33617489617949, "high": 102.72537338558878, "low": 102.14718461113877, "close": 102.25934894997287 }, { "date": "2014-07-21T04:00:00.000Z", "open": 102.2851774317456, "high": 102.50404092081082, "low": 101.7870215681443, "close": 102.45923109803208 }, { "date": "2014-07-22T04:00:00.000Z", "open": 102.4487012112957, "high": 102.47899570124885, "low": 101.18221879681147, "close": 101.18221879681147 }, { "date": "2014-07-23T04:00:00.000Z", "open": 101.31141957279944, "high": 101.38261560555999, "low": 100.69910715400468, "close": 101.33055535092736 }, { "date": "2014-07-24T04:00:00.000Z", "open": 101.44980299828428, "high": 102.4626033208315, "low": 101.15148097514599, "close": 102.32319282145093 }, { "date": "2014-07-25T04:00:00.000Z", "open": 102.23512084093635, "high": 102.88871927443061, "low": 101.90966328472798, "close": 102.73276679938544 }, { "date": "2014-07-28T04:00:00.000Z", "open": 102.6989293387597, "high": 102.88795507757983, "low": 101.92417491144057, "close": 102.28164516438707 }, { "date": "2014-07-29T04:00:00.000Z", "open": 102.30840617841785, "high": 103.15943499782308, "low": 102.02091529528434, "close": 102.92098117590523 }, { "date": "2014-07-30T04:00:00.000Z", "open": 102.9308001935708, "high": 103.15556214966986, "low": 102.4302545574611, "close": 103.14412624946699 }, { "date": "2014-07-31T04:00:00.000Z", "open": 103.07085254535994, "high": 103.41100032050178, "low": 102.71455413786893, "close": 102.9902314632175 }, { "date": "2014-08-01T04:00:00.000Z", "open": 102.97055666818727, "high": 103.23563422358177, "low": 102.67523781279218, "close": 102.96210094334931 }, { "date": "2014-08-04T04:00:00.000Z", "open": 102.99273550909939, "high": 104.05267893637125, "low": 102.99273550909939, "close": 103.6776694497643 }, { "date": "2014-08-05T04:00:00.000Z", "open": 103.71552311798385, "high": 104.14075009798611, "low": 103.3039140515802, "close": 103.82240081319826 }, { "date": "2014-08-06T04:00:00.000Z", "open": 103.92587368643419, "high": 104.40601918290629, "low": 103.78402320233198, "close": 103.80311941943117 }, { "date": "2014-08-07T04:00:00.000Z", "open": 103.71962119484172, "high": 104.03020908840242, "low": 103.2853340055121, "close": 104.03020908840242 }, { "date": "2014-08-08T04:00:00.000Z", "open": 104.09011693645546, "high": 104.52566632252376, "low": 103.8784179055189, "close": 104.3170210868206 }, { "date": "2014-08-11T04:00:00.000Z", "open": 104.27748707745498, "high": 104.49900387956822, "low": 104.09605933799217, "close": 104.3030896826152 }, { "date": "2014-08-12T04:00:00.000Z", "open": 104.41206303091255, "high": 104.6088222686324, "low": 102.98988598482157, "close": 103.10382085836387 }, { "date": "2014-08-13T04:00:00.000Z", "open": 102.99523183524114, "high": 103.05572317403384, "low": 102.57802541552314, "close": 102.5992463155287 }, { "date": "2014-08-14T04:00:00.000Z", "open": 102.475831068629, "high": 102.475831068629, "low": 101.5589073949309, "close": 101.83016360535382 }, { "date": "2014-08-15T04:00:00.000Z", "open": 101.87004224020066, "high": 102.81625105560244, "low": 101.87004224020066, "close": 102.81625105560244 }, { "date": "2014-08-18T04:00:00.000Z", "open": 102.88708277394221, "high": 103.6424021341927, "low": 102.84557177897194, "close": 103.61316622058368 }, { "date": "2014-08-19T04:00:00.000Z", "open": 103.48566336216392, "high": 104.43896953161367, "low": 103.48566336216392, "close": 103.55906840805964 }, { "date": "2014-08-20T04:00:00.000Z", "open": 103.65984351540233, "high": 103.82716362505734, "low": 102.89370552054996, "close": 102.943574376974 }, { "date": "2014-08-21T04:00:00.000Z", "open": 102.88666241420552, "high": 103.78004233952296, "low": 102.82158877333822, "close": 103.77266148068155 }, { "date": "2014-08-22T04:00:00.000Z", "open": 103.72064339346774, "high": 104.57055614687714, "low": 103.53056715269659, "close": 103.61533961836201 }, { "date": "2014-08-25T04:00:00.000Z", "open": 103.61005026702298, "high": 104.3558602663659, "low": 103.57940506559942, "close": 104.24621264399245 }, { "date": "2014-08-26T04:00:00.000Z", "open": 104.27304251271033, "high": 104.30623276203546, "low": 103.7987869437825, "close": 104.23765037758432 }, { "date": "2014-08-27T04:00:00.000Z", "open": 104.26693929569689, "high": 104.78767774801406, "low": 104.07932188795078, "close": 104.78767774801406 }, { "date": "2014-08-28T04:00:00.000Z", "open": 104.74136324319993, "high": 104.74136324319993, "low": 103.60383595716164, "close": 103.9749275265512 }, { "date": "2014-08-29T04:00:00.000Z", "open": 103.9242281999782, "high": 104.1966281090823, "low": 103.60165778942338, "close": 104.10778121478897 }, { "date": "2014-09-01T04:00:00.000Z", "open": 104.10984651736153, "high": 104.58729985442827, "low": 102.91001871892948, "close": 102.95010617572991 }];
-        var file = "data/" + currentSymbol + "Weekly" + ".csv";
-        d3.csv(file).then(function (data) {
-            var data1 = data.filter(function(d) {
-                return (new Date(d.date) >= startDate && new Date(d.date) <= endDate);
-            });
-            renderShowMe(data1, chartType);
-        });
+    var showMergedDialog = function(obj){
         
+        hideDialog();
+        
+        if (obj.value > 0){
+            showDialog();
+        }
+    }
+    
+    function showDialog(){
+        var chart = document.getElementById("chart");
+        
+        chart1.focusOn(chart1.VerHorMergedDialog);
+        
+        chart.addEventListener("mousemove", function(event) {
+            showFloatingDiv(event);
+        });
+
+    }
+
+    function showDialogInside(){
+        var chart = document.getElementById("chart");
+        
+        chart1.focusOn(chart1.VerHorInsideDialog);
+        
+        chart.addEventListener("mousemove", function(event) {
+            showFloatingDiv(event);
+        });
+
+    }
+
+    function showFloatingDiv(e) {
+        var dialog = document.getElementById("dialog");
+        dialog.className = ".showDiv";
+        
+        var mouseX = e.clientX;
+        var mouseY = e.clientY;
+        var coor = "Coordinates: (" + mouseX + "," + mouseY + ")";
+        dialog.style.left = mouseX + 5 + "px";
+        dialog.style.top = mouseY + 5 + "px";
+    }
+
+    function hideDialog(){
+        
+        d3.select("#dialog").select("svg").remove();
+        var div = document.getElementById("dialog");
+        chart1.focusOff();
+    }
+
+    function loadMergedDialog(id, weeklydata){
+        //console.log(weeklydata);
+        var selShowMergedValue = document.getElementById("selShowMerged").value;
+        //console.log(selShowMergedValue);
+        var idcnt = selShowMergedValue - 1;
+        var id1 = id - idcnt;
+        var id2 = id;
+        //console.log(id1);
+        //console.log(id2);
+        
+        var data1 = weeklydata.filter(function(d) {
+                return (d.id >= id1 && d.id <= id2);
+        });
+        //console.log(data1);
+        renderMergedDialog(data1, chartType);
         
     }
 
-    function renderShowMe(data, chartType) {
+    function loadInsideDialog(id, weeklydata){
+        var selShowInsideBarsValue = document.getElementById("selShowInsideBars").value;
+        var symbol = document.getElementById("selCommidity").value;
+        var id1 = id - selShowInsideBarsValue;
+        var id2 = id;
+        
+        var dataRange = weeklydata.filter(function(d) {
+            return (d.id >= id1 && d.id <= id2);
+        });
+        var startDate = d3.min(dataRange, function (d) { return d.date; });
+        var endDate = d3.max(dataRange, function (d) { return d.date; });
+        startDate = new Date(startDate);
+        endDate = new Date(endDate);
+        
+        var file = "data/" + "AltDaily" + ".csv";
+        d3.csv(file).then(function (data) {
+            var data1 = data.filter(function(d) {
+                return (d.symbol == symbol && new Date(d.date) >= startDate && new Date(d.date) <= endDate);
+            });
+            renderInsideDialog(data1, chartType);
+        });
+    }
+    
+    function renderMergedDialog(data, chartType) {
+        "use strict";
+        d3.select("#dialog").select("svg").remove();
+        
+        var i = 1;
         data.forEach(function (d) {
             d.date = new Date(d.date);
             d.open = +d.open;
             d.high = +d.high;
             d.low = +d.low;
             d.close = +d.close;
+            d.id = +d.id;
+            d.barnum = i++;
         });
+        //console.log(data);
+        var date = null;
+        var open = 0;
+        var high = 0;
+        var low = 0;
+        var close = 0;
+        var datalength = data.length;
+        var objData = {};
+        var newData = [];
 
+        data.forEach(function (d) {
+            if (d.barnum == datalength){ 
+                date = d.date;
+                close = d.close; 
+            }
+            if (d.barnum == 1){  
+                open = d.open; 
+            }
+        });
+        
+        high = d3.max(data, function(d) { return d["high"]; });
+        low = d3.min(data, function(d) { return d["low"]; });
+        
+        objData.date = date;
+        objData.open = open;
+        objData.high = high;
+        objData.low = low;
+        objData.close = close;
+
+        newData.push(objData);
+        data = newData;
+        
         var xScale = d3.scaleTime();
         var yScale1 = d3.scaleLinear();
         var yScale2 = d3.scaleLinear();
 
         var xAxis = d3.axisBottom().scale(xScale).ticks(5);
-
         var yAxis1 = d3.axisLeft().scale(yScale1);
         var yAxis2 = d3.axisLeft().scale(yScale2);
 
@@ -184,22 +285,178 @@
             .x(function (d) { return d.x; })
             .y(function (d) { return d.y; });
 
-        var fromDate = d3.min(data, function (d) { return d["date"]; });
-        var toDate = d3.max(data, function (d) { return d["date"]; });
+        var inputwidth = 200;
+        var inputheight = 200;
+        var margin = { top: 20, right: 20, bottom: 30, left: 50 };
+        var displayWidth = inputwidth - margin.left - margin.right;
+        var displayHeight = inputheight - margin.top - margin.bottom;
+        
+        // Create svg element
+        var svg = d3.select("#dialog").classed('chart', true).append('svg')
+            .attr('width', displayWidth + margin.left + margin.right)
+            .attr('height', displayHeight + margin.top + margin.bottom);
+        
+        // Ceate chart
+        var g = svg.append('g')
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        
+        // Create plot area
+        var plotArea = g.append('g');
 
-        dataArray = data.map(function (d) { return d; });
+        // Set scale domains
+        var xDomain = d3.extent(data, function (d) { return d.date; });
+        xScale.domain(xDomain);
+    
+        var ymin1 = d3.min(data, function(d) { return d["low"]; });// - 50;
+        var ymax1 = d3.max(data, function(d) { return d["high"]; });// + 50;
+        var yRangePercent1 = (ymax1 - ymin1) * 0.05;
+        var yDomain1 = [ymin1 - yRangePercent1, ymax1 + yRangePercent1];
+        yScale1.domain(yDomain1);
 
-        var zoom = d3.zoom()
-            .scaleExtent([0.5, 50])
-            .on('zoom', zoomed)
-            .on('end', zoomend);
+        // Set scale ranges
+        xScale.range([0, displayWidth]);
+        yScale1.range([displayHeight, 0]);
+        var fromDate = new Date("2018-10-01");
+        var toDate = new Date("2018-10-31");
 
-        var zoomChart = sl.example.zoomChart(zoom, data, xScale, yScale1, yScale2, xAxis, yAxis1, yAxis2, fromDate, toDate);
+        if (chartType === "CandleStick") {
+            var series = candlestickSeries()
+                .xScale(xScale)
+                .yScale(yScale1);
+        }
+        if (chartType === "OHLC") {
+            var series = ohlcSeries()
+                .xScale(xScale)
+                .yScale(yScale1);
+            series.tickWidth(calculateTickWidth(xScale, fromDate, toDate));
+        }        
+        // Draw series.
+        plotArea.append('g')
+            .attr('class', 'series')
+            .datum(data)
+            .call(series);
+          
+        // Draw axes
+        g.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + displayHeight + ')')
+            .call(xAxis);
+            
+        g.append('g')
+            .attr('class', 'y axis')
+            .call(yAxis1);
+        
+    }
 
-        zoomChart();
+    function renderInsideDialog(data, chartType) {
+        "use strict";
+        d3.select("#dialog").select("svg").remove();
+        var i = 1;
+        data.forEach(function (d) {
+            d.date = new Date(d.date);
+            d.open = +d.open;
+            d.high = +d.high;
+            d.low = +d.low;
+            d.close = +d.close;
+            d.id = i++;
+        });
 
+        var xScale = d3.scaleTime();
+        var yScale1 = d3.scaleLinear();
+        var yScale2 = d3.scaleLinear();
+
+        var xAxis = d3.axisBottom().scale(xScale).ticks(5);
+        var yAxis1 = d3.axisLeft().scale(yScale1);
+        var yAxis2 = d3.axisLeft().scale(yScale2);
+
+        var line = d3.line()
+            .x(function (d) { return d.x; })
+            .y(function (d) { return d.y; });
+        
+        //console.log(data.length);
+        var inputwidth = 200;
+        var inputheight = 200;
+        if (data.length > 15){
+            inputwidth = 300;
+        }
+        if (data.length > 10){
+            inputwidth = 400;
+        }
+        var margin = { top: 20, right: 20, bottom: 30, left: 50 };
+        var displayWidth = inputwidth - margin.left - margin.right;
+        var displayHeight = inputheight - margin.top - margin.bottom;
+    
+        // Create svg element
+        var svg = d3.select("#dialog").classed('chart', true).append('svg')
+            .attr('width', displayWidth + margin.left + margin.right)
+            .attr('height', displayHeight + margin.top + margin.bottom);
+        
+        // Ceate chart
+        var g = svg.append('g')
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        
+        // Create plot area
+        var plotArea = g.append('g');
+
+        // Set scale domains
+        var xDomain = d3.extent(data, function (d) { return d.date; });
+        xScale.domain(xDomain);
+    
+        var ymin1 = d3.min(data, function(d) { return d["low"]; });// - 50;
+        var ymax1 = d3.max(data, function(d) { return d["high"]; });// + 50;
+        var yRangePercent1 = (ymax1 - ymin1) * 0.05;
+        var yDomain1 = [ymin1 - yRangePercent1, ymax1 + yRangePercent1];
+        yScale1.domain(yDomain1);
+
+        // Set scale ranges
+        xScale.range([0, displayWidth]);
+        yScale1.range([displayHeight, 0]);
+        var fromDate = new Date("2018-10-01");
+        var toDate = new Date("2018-10-31");
+
+        if (chartType === "CandleStick") {
+            var series = candlestickSeries()
+                .xScale(xScale)
+                .yScale(yScale1);
+        }
+        if (chartType === "OHLC") {
+            var series = ohlcSeries()
+                .xScale(xScale)
+                .yScale(yScale1);
+            series.tickWidth(calculateTickWidth(xScale, fromDate, toDate));
+        }        
+        // Draw series.
+        plotArea.append('g')
+            .attr('class', 'series')
+            .datum(data)
+            .call(series);
+          
+        // Draw axes
+        g.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + displayHeight + ')')
+            .call(xAxis);
+            
+        g.append('g')
+            .attr('class', 'y axis')
+            .call(yAxis1);
+        
     }
 
 </script>
+<script>
+        var selCommodity = document.getElementById("selCommidity");
+        selCommodity.selectedIndex = 1;
+        
+        chooseCommodity(selCommodity);
+        loadData();
+
+        var btnCandleStick = document.getElementById("btnCandleStick");
+        var btnOHLC = document.getElementById("btnOHLC");
+        btnCandleStick.className = "buttonActive";
+        btnOHLC.className = "buttonInActive";
+        
+ </script>
+
  </body>
  </html>

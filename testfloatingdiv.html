@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test Floating Div</title>
+    <style>
+    #outerDiv {
+        background-color:aliceblue;
+        margin: 40px;
+        width: 400px;
+        height: 400px;
+        position: relative;
+    }
+
+    #innerDiv {
+        background-color: red;
+        width: 50px;
+        height: 50px;
+        position: absolute;
+    }
+
+    .hideDiv{
+        visibility: hidden;
+        display: none;
+
+    }
+
+    .showDiv{
+        visibility: visible;
+        display: block;
+    }
+    </style>
+</head>
+<body onload="init();">
+    <div id="outerDiv">
+        <p id="demo"></p>
+    </div>
+    <div id="innerDiv" class="hideDiv"></div>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button id=btnShowInnerDiv onclick="showDiv();">Test</button>
+    <script>
+        function showDiv(){
+            document.getElementById("innerDiv").className = ".showDiv";
+
+        }
+        var outerDiv = document.getElementById("outerDiv");
+        var innerDiv = document.getElementById("innerDiv");
+        
+        function init(){
+            //console.log("hello");  
+            
+            
+            outerDiv.addEventListener("mouseout", function(event) {
+                hideFloatingDiv();
+            });
+            
+            outerDiv.addEventListener("mousemove", function(event) {
+                showFloatingDiv(event);
+            });
+            
+        }
+
+        function showFloatingDiv(e) {
+            console.log("showFloatingDiv");
+            innerDiv.className = ".showDiv";
+            
+            var mouseX = e.clientX;
+            var mouseY = e.clientY;
+            var coor = "Coordinates: (" + mouseX + "," + mouseY + ")";
+            demo = document.getElementById("demo").innerHTML = coor;
+            innerDiv.style.left = mouseX + 5 + "px";
+            innerDiv.style.top = mouseY + 5 + "px";
+        }
+
+        function hideFloatingDiv(e){
+            console.log("hideFloatingDiv");
+            innerDiv.className = ".hideDiv";
+            console.log("end hideFloatingDiv");
+            
+            //outerDiv.removeEventListener("mousemove", function(event) {
+            //    myFunction(event);
+            //});
+        }
+
+        //console.log("hello1");
+        /*
+        var div = document.getElementById("outerDiv");
+        div.addEventListener("mousemove", function(event) {
+            myFunction(event);
+        });
+        div.addEventListener("mouseover", function(event) {
+            showFloatingDiv();
+        });
+        div.addEventListener("mouseout", function(event) {
+            hideFloatingDiv();
+        });
+        */
+       
+        
+        
+        
+    
+    </script>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 
-    sl.series.ohlc = function () {
+    var ohlcSeries = function () {
 
         var xScale = d3.scaleTime(),
             yScale = d3.scaleLinear();
@@ -61,7 +61,7 @@
             
         };
 
-        var ohlc = function(selection) {
+        var ohlcSeries = function(selection) {
             var series, bars;
             
             selection.each(function(data) {
@@ -91,30 +91,30 @@
         };
 
 
-        ohlc.xScale = function (value) {
+        ohlcSeries.xScale = function (value) {
             if (!arguments.length) {
                 return xScale;
             }
             xScale = value;
-            return ohlc;
+            return ohlcSeries;
         };
 
-        ohlc.yScale = function(value) {
+        ohlcSeries.yScale = function(value) {
             if (!arguments.length) {
                 return yScale;
             }
             yScale = value;
-            return ohlc;
+            return ohlcSeries;
         };
 
-        ohlc.tickWidth = function (value) {
+        ohlcSeries.tickWidth = function (value) {
             if (!arguments.length) {
                 return tickWidth;
             }
             tickWidth = value;
-            return ohlc;
+            return ohlcSeries;
         };
 
-        return ohlc;
+        return ohlcSeries;
 
     };

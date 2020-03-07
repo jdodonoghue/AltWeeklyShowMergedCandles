@@ -1,209 +1,147 @@
-﻿function chooseCommodity(obj) {
+﻿
+function preRender(){
+    
+    var symbol = document.getElementById("selCommidity").value;
+    var startDay = document.getElementById("selWeekStart").value;
+    
+    d3.select("#chart").select("svg").remove();
+    if (symbol == 0) return;
+    
+    var fromDate = new Date("2018-01-01");
+    var toDate = new Date("2019-12-31");
+
+    var file = "data/" + "AltWeekly" + ".csv";
+    d3.csv(file).then(function (data) {
+        var i = 1;
+        data.forEach(function (d) {
+            d.date = new Date(d.date);
+            d.open = +d.open;
+            d.high = +d.high;
+            d.low = +d.low;
+            d.close = +d.close;
+            d.startday = +d.startday;
+            d.id = i++;
+        });
+        var data1 = data.filter(function(d) {
+            return (d.startday == startDay && d.date >= fromDate && d.date <= toDate && d.symbol == symbol );
+        });
+        render(data1);
+    });
+
+}
+
+function render(data, chartType){
+    var i = 1;
+    data.forEach(function (d) {
+        //console.log(d.id);
+        d.date = new Date(d.date);
+        d.open = +d.open;
+        d.high = +d.high;
+        d.low = +d.low;
+        d.close = +d.close;
+        d.id = i++;;
+    });
+    //console.log();
+    fromDate = d3.min(data, function (d) { return d["date"]; });
+    toDate = d3.max(data, function (d) { return d["date"]; });
+
+    var inputwidth = 800;
+    var inputheight = 400;
+
+    var dataArray = data;
+
+    chart1 = createChart(data);
+    chart1.Name = "chart1";
+    chart1.element = "#chart";
+    chart1.inputwidth = inputwidth;
+    chart1.inputheight = inputheight;
+    chart1.Chart();
+    
+}    
+
+function chooseCommodity(obj) {
         
     currentSymbol = obj.value;
     d3.select("#chart").select("svg").remove();
     if (obj.value == 0) return;
     
-    var file = "data/" + currentSymbol + "Weekly" + ".csv";
-    d3.csv(file).then(function (data) {
-        render(data);
-    });
-
+    //console.log(data);
+    preRender();
+    
     document.getElementById("btnCandleStick").disabled = false;
     document.getElementById("btnOHLC").disabled = false;
     document.getElementById("btnPTOn").disabled = false;
 
 }
 
+
 function chooseWeekStart(obj) {
-    startday = obj.value;
-    d3.select("#chart").select("svg").remove();
-    if (obj.value == 0) return;
-    
-    var file = "data/" + currentSymbol + "Weekly" + ".csv";
-    d3.csv(file).then(function (data) {
-        render(data);
-    });
+    preRender();
+
 }
 
 function changeChartType(obj) {
+    var btnCandleStick = document.getElementById("btnCandleStick");
+    var btnOHLC = document.getElementById("btnOHLC");
+    document.getElementById("selShowMerged").selectedIndex = 0;
 
+    d3.select("#chart").select("svg").remove();
+    d3.select("#dialog").select("svg").remove();
     if (obj.id == "btnCandleStick") {
         chartType = "CandleStick";
-        d3.select("#chart").select("svg").remove();
-    
-        var file = "data/" + currentSymbol + "Weekly" + ".csv";
-        d3.csv(file).then(function (data) {
-            render(data, chartType);
-        });
-        $("#btnCandleStick").css("background-color", "rgb(69, 140, 161)");
-        $("#btnCandleStick").css("color", "white");
-        $("#btnOHLC").css("background-color", "");
-        $("#btnOHLC").css("color", "");
+        
+        preRender();
+        
+        btnCandleStick.className = "buttonActive1";
+        btnOHLC.className = "buttonInActive";
     }
     if (obj.id == "btnOHLC") {
         chartType = "OHLC";
-        d3.select("#chart").select("svg").remove();
-    
-        var file = "data/" + currentSymbol + "Weekly" + ".csv";
-        d3.csv(file).then(function (data) {
-            render(data, chartType);
-        });
-        $("#btnOHLC").css("background-color", "rgb(69, 140, 161)");
-        $("#btnOHLC").css("color", "white");
-        $("#btnCandleStick").css("background-color", "");
-        $("#btnCandleStick").css("color", "");
+        
+        preRender();
+
+        btnOHLC.className = "buttonActive1";
+        btnCandleStick.className = "buttonInActive";
+        
     }
 }
 
 var setBtnStyle = function(obj){
+    var btnPTOn = document.getElementById("btnPTOn");
+    var btnVerOn = document.getElementById("btnVerOn");
+    var btnHorOn = document.getElementById("btnHorOn");
+    var btnOff = document.getElementById("btnOff");
+    btnPTOn.className = "buttonInActive";
+    btnVerOn.className = "buttonInActive";
+    btnHorOn.className = "buttonInActive";
+    btnOff.className = "buttonInActive";
 
-    if (obj.id == "btnOff"){
-        $("#btnPTOn").css("background-color", "");
-        $("#btnPTOn").css("color", "");
-    }
     if (obj.id == "btnPTOn"){
-        $("#btnPTOn").css("background-color", "rgb(69, 140, 161)");
-        $("#btnPTOn").css("color", "white");
+        btnPTOn.className = "buttonActive2";
     }
-
-}
-
-var focusOn = function (fn) {
-    clearFocus();
-    g.on('mouseover', function () { focus.style('display', null); })
-    g.on('mouseout', function () { focus.style('display', 'none'); })
-    g.on('mousemove', fn);
-}
-
-var focusOff = function () {
-    clearFocus();
-    g.on('mouseover', null);
-    g.on('mouseout', null);
-    g.on('mousemove', null);
-    //$('#dialog').dialog('close');
-}
-
-var clearFocus = function () {
-    focus.select('#focusLineX1')
-        .attr('x1', 0).attr('y1', 0)
-        .attr('x2', 0).attr('y2', 0);
-    focus.select('#focusLineX2')
-        .attr('x1', 0).attr('y1', 0)
-        .attr('x2', 0).attr('y2', 0);
-    focus.select('#focusLineY')
-        .attr('x1', 0).attr('y1', 0)
-        .attr('x2', 0).attr('y2', 0);
-}
-
-var showMerged = function(){
-    console.log("showMerged");
-}
-
-function zoomed() {
-
-    var transform = d3.event.transform;
-    var xDomain = xScale.domain();
-
-    var range = moment().range(xDomain[0], xDomain[1]);
-
-    var filteredData = [];
-    var g = d3.selectAll('svg').select('g');
-
-    for (var i = 0; i < dataArray.length; i += 1) {
-        if (range.contains(dataArray[i].date)) {
-            filteredData.push(dataArray[i]);
-        }
+    if (obj.id == "btnVerOn"){
+        btnVerOn.className = "buttonActive2";
     }
+    if (obj.id == "btnHorOn"){
+        btnHorOn.className = "buttonActive2";
+    }
+    if (obj.id == "btnOff"){
+        btnOff.className = "buttonActive2";
+    }
+}
 
-    g.select('.x.axis')
-        .call(xAxis);
-
-    var ymin1 = d3.min(filteredData, function (d) { return d["low"]; });// - 50;
-    var ymax1 = d3.max(filteredData, function (d) { return d["high"]; });// + 50;
-    var yRangePercent1 = (ymax1 - ymin1) * 0.05;
-    var yDomain1 = [ymin1 - yRangePercent1, ymax1 + yRangePercent1];
-    yScale1.domain(yDomain1);
+function displayData(d) {
+    var dataheader = document.getElementById("dataheader");
+    var message = "";
+    var formatTime = d3.timeFormat("%m/%d/%Y");
+    var date = formatTime(d.date); // "June 30, 2015"
     
-    var xNewScale = transform.rescaleX(xScale);
-    xAxis.scale(xNewScale);
-    
-    g.select('.x.axis')
-        .call(xAxis);
-
-    var yNewScale1 = transform.rescaleY(yScale1);
-    
-    yAxis1.scale(yNewScale1);
-    g.select('.y.axis')
-        .call(yAxis1);
-
-    //
-    var ymin1 = d3.min(filteredData, function (d) { return d["specnet"]; });
-    var ymin2 = d3.min(filteredData, function (d) { return d["noncommnet"]; });
-    var ymin3 = d3.min(filteredData, function (d) { return d["commnet"]; });
-
-    var ymax1 = d3.max(filteredData, function (d) { return d["specnet"]; });
-    var ymax2 = d3.max(filteredData, function (d) { return d["noncommnet"]; });
-    var ymax3 = d3.max(filteredData, function (d) { return d["commnet"]; });
-
-    if (ymin1 > ymin2) {
-        ymin1 = ymin2;
-    }
-    if (ymin1 > ymin3) {
-        ymin1 = ymin3;
-    }
-    if (ymax1 < ymax2) {
-        ymax1 = ymax2;
-    }
-    if (ymax1 < ymax3) {
-        ymax1 = ymax3;
-    }
-    /*
-    var yRangePercent2 = (ymax1 - ymin1) * 0.05;
-    yDomain2 = [ymin1 - yRangePercent2, ymax2 + yRangePercent2];
-    yScale2.domain(yDomain2);
-    
-    if (showIndicator == true) {
-        g.select('#yIndAxis')
-            .call(yAxis2);
-
-        g.select(".indicatorline1")
-            .attr("d", indicatorline1(filteredData));
-
-        g.select(".indicatorline2")
-            .attr("d", indicatorline2(filteredData));
-
-        g.select(".indicatorline3")
-            .attr("d", indicatorline3(filteredData));
-    }
-    */
-    if (chartType == "CandleStick") {
-
-        //series = sl.series.candlestick()
-        //    .xScale(xScale)
-        //    .yScale(yScale1);
-
-    }
-    if (chartType == "OHLC") {
-
-        //series = sl.series.ohlc()
-        //    .xScale(xScale)
-        //    .yScale(yScale1);
-
-        //fromDate = d3.min(filteredData, function (d) { return d["date"]; });
-        //toDate = d3.max(filteredData, function (d) { return d["date"]; });
-
-        //series.tickWidth(calculateTickWidth(xScale, fromDate, toDate));
-
-    }
-
-    g.select('.series').attr("transform", "translate(" + transform.x + "," + 0 + ") scale(" + transform.k + ")");
-    g.select('.series')
-        .call(series);
-
-
+    message = "Date: " + date + " Open: " + d.open + " High: " + d.high + " Low: " + d.low + " Close: " + d.close;
+    dataheader.innerHTML = message;
 }
 
-function zoomend() {
-
+function displayDataOff() {
+    var dataheader = document.getElementById("dataheader");
+    var message = "";
+    dataheader.innerHTML = message;
 }
