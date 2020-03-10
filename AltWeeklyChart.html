@@ -1,4 +1,4 @@
-﻿<html>
+<html>
     <header>
 
 
@@ -187,19 +187,14 @@
     }
 
     function loadMergedDialog(id, weeklydata){
-        //console.log(weeklydata);
         var selShowMergedValue = document.getElementById("selShowMerged").value;
-        //console.log(selShowMergedValue);
         var idcnt = selShowMergedValue - 1;
         var id1 = id - idcnt;
         var id2 = id;
-        //console.log(id1);
-        //console.log(id2);
         
         var data1 = weeklydata.filter(function(d) {
                 return (d.id >= id1 && d.id <= id2);
         });
-        //console.log(data1);
         renderMergedDialog(data1, chartType);
         
     }
@@ -241,7 +236,7 @@
             d.id = +d.id;
             d.barnum = i++;
         });
-        //console.log(data);
+        
         var date = null;
         var open = 0;
         var high = 0;
@@ -274,13 +269,11 @@
         data = newData;
         
         var xScale = d3.scaleTime();
-        var yScale1 = d3.scaleLinear();
-        var yScale2 = d3.scaleLinear();
-
+        var yScale = d3.scaleLinear();
+    
         var xAxis = d3.axisBottom().scale(xScale).ticks(5);
-        var yAxis1 = d3.axisLeft().scale(yScale1);
-        var yAxis2 = d3.axisLeft().scale(yScale2);
-
+        var yAxis = d3.axisLeft().scale(yScale);
+    
         var line = d3.line()
             .x(function (d) { return d.x; })
             .y(function (d) { return d.y; });
@@ -307,27 +300,28 @@
         var xDomain = d3.extent(data, function (d) { return d.date; });
         xScale.domain(xDomain);
     
-        var ymin1 = d3.min(data, function(d) { return d["low"]; });// - 50;
-        var ymax1 = d3.max(data, function(d) { return d["high"]; });// + 50;
-        var yRangePercent1 = (ymax1 - ymin1) * 0.05;
-        var yDomain1 = [ymin1 - yRangePercent1, ymax1 + yRangePercent1];
-        yScale1.domain(yDomain1);
+        var ymin = d3.min(data, function(d) { return d["low"]; });// - 50;
+        var ymax = d3.max(data, function(d) { return d["high"]; });// + 50;
+        var yRangePercent = (ymax - ymin) * 0.05;
+        var yDomain = [ymin - yRangePercent, ymax + yRangePercent];
+        yScale.domain(yDomain);
 
         // Set scale ranges
         xScale.range([0, displayWidth]);
-        yScale1.range([displayHeight, 0]);
+        yScale.range([displayHeight, 0]);
+
         var fromDate = new Date("2018-10-01");
         var toDate = new Date("2018-10-31");
 
         if (chartType === "CandleStick") {
             var series = candlestickSeries()
                 .xScale(xScale)
-                .yScale(yScale1);
+                .yScale(yScale);
         }
         if (chartType === "OHLC") {
             var series = ohlcSeries()
                 .xScale(xScale)
-                .yScale(yScale1);
+                .yScale(yScale);
             series.tickWidth(calculateTickWidth(xScale, fromDate, toDate));
         }        
         // Draw series.
@@ -344,7 +338,7 @@
             
         g.append('g')
             .attr('class', 'y axis')
-            .call(yAxis1);
+            .call(yAxis);
         
     }
 
@@ -362,22 +356,24 @@
         });
 
         var xScale = d3.scaleTime();
-        var yScale1 = d3.scaleLinear();
-        var yScale2 = d3.scaleLinear();
-
+        var yScale = d3.scaleLinear();
+        
         var xAxis = d3.axisBottom().scale(xScale).ticks(5);
-        var yAxis1 = d3.axisLeft().scale(yScale1);
-        var yAxis2 = d3.axisLeft().scale(yScale2);
-
+        var yAxis = d3.axisLeft().scale(yScale);
+        
         var line = d3.line()
             .x(function (d) { return d.x; })
             .y(function (d) { return d.y; });
         
-        //console.log(data.length);
+        var fromDate = new Date("2018-01-01");
+        var toDate = new Date("2018-4-30");
+        
         var inputwidth = 200;
         var inputheight = 200;
+        
         if (data.length > 15){
             inputwidth = 300;
+            toDate = new Date("2018-6-30");
         }
         if (data.length > 10){
             inputwidth = 400;
@@ -402,29 +398,29 @@
         var xDomain = d3.extent(data, function (d) { return d.date; });
         xScale.domain(xDomain);
     
-        var ymin1 = d3.min(data, function(d) { return d["low"]; });// - 50;
-        var ymax1 = d3.max(data, function(d) { return d["high"]; });// + 50;
-        var yRangePercent1 = (ymax1 - ymin1) * 0.05;
-        var yDomain1 = [ymin1 - yRangePercent1, ymax1 + yRangePercent1];
-        yScale1.domain(yDomain1);
+        var ymin = d3.min(data, function(d) { return d["low"]; });// - 50;
+        var ymax = d3.max(data, function(d) { return d["high"]; });// + 50;
+        var yRangePercent = (ymax - ymin) * 0.05;
+        var yDomain = [ymin - yRangePercent, ymax + yRangePercent];
+        yScale.domain(yDomain);
 
         // Set scale ranges
         xScale.range([0, displayWidth]);
-        yScale1.range([displayHeight, 0]);
-        var fromDate = new Date("2018-10-01");
-        var toDate = new Date("2018-10-31");
+        yScale.range([displayHeight, 0]);
+        
 
         if (chartType === "CandleStick") {
             var series = candlestickSeries()
                 .xScale(xScale)
-                .yScale(yScale1);
+                .yScale(yScale);
         }
         if (chartType === "OHLC") {
             var series = ohlcSeries()
                 .xScale(xScale)
-                .yScale(yScale1);
+                .yScale(yScale);
             series.tickWidth(calculateTickWidth(xScale, fromDate, toDate));
         }        
+        
         // Draw series.
         plotArea.append('g')
             .attr('class', 'series')
@@ -439,7 +435,7 @@
             
         g.append('g')
             .attr('class', 'y axis')
-            .call(yAxis1);
+            .call(yAxis);
         
     }
 
