@@ -15,7 +15,7 @@ function createChart(data) {
     myChart.yScale2 = null;
     myChart.xAxis = null;
     myChart.yAxis1 = null;
-    myChart.yAxis2 = null;
+    //myChart.yAxis2 = null;
     myChart.series = null;
     myChart.inputwidth = "";
     myChart.inputheight = "";
@@ -35,12 +35,10 @@ function createChart(data) {
         
         xScale = d3.scaleTime();
         yScale1 = d3.scaleLinear();
-        yScale2 = d3.scaleLinear();
 
         xAxis = d3.axisBottom().scale(xScale).ticks(5);
 
         yAxis1 = d3.axisLeft().scale(yScale1);
-        yAxis2 = d3.axisLeft().scale(yScale2);
 
         line = d3.line()
             .x(function (d) { return d.x; })
@@ -104,7 +102,6 @@ function createChart(data) {
 
         var yRangePercent2 = (ymax1 - ymin1) * 0.05;
         yDomain2 = [ymin1 - yRangePercent2, ymax2 + yRangePercent2];
-        yScale2.domain(yDomain2);
             
         // Set scale ranges
         xScale.range([0, width]);
