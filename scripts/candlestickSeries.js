@@ -68,7 +68,7 @@
                 var candlestickseries = series.enter().append('g')
                     .classed('candlestick-series', true);
                 
-                var bars = candlestickseries.selectAll("g")
+                bars = candlestickseries.selectAll("g")
                     .data(data, function(d) {
                        return [d];
                    })
