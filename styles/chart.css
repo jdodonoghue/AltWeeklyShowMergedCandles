@@ -1,4 +1,4 @@
-﻿html * {
+html * {
     box-sizing: border-box;
 }
 
@@ -153,6 +153,8 @@ path {
 }
 
 .chart .bar.down-day rect {
+    fill: rgb(255,255,255);
+    stroke-width: 1;
     fill: #007fff;
 }
 
@@ -172,7 +174,7 @@ path {
 #dialog {
     position: absolute;
     background-color: rgb(233, 227, 227);
-    opacity: 0.5;
+    opacity: 0.9;
 }
 
 #chart {
